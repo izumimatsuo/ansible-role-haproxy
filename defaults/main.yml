@@ -3,5 +3,5 @@
 haproxy_frontend_bind: '*:80'
 haproxy_balance_logic: 'roundrobin' # roundrobin or leastconn 
 haproxy_backend_servers: [] # ['web1 192.168.33.21:80', 'web2 192.168.33.22:80']
-keepalived_check_interfale: # 'eth1'
+keepalived_check_interface: # 'eth1'
 keepalived_virtual_ipaddr: # '192.168.33.10'

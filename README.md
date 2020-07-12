@@ -8,8 +8,8 @@ CentOS 7 に haproxy/keepalived を導入する ansible role です。
 
 | 項目名             | デフォルト値| 説明               |
 | ------------------ | ----------- | ------------------ |
-| haproxy_frontend_bind | *:80     | INPUTポート番号    |
+| haproxy_frontend_bind | *:80     | LISTENポート番号   |
 | haproxy_balance_logic | roundrobin | 振分けロジック   |
-| haproxy_backend_servers | none   | 振分け先サーバ     |
-| keepalived_check_interfale | none | チェックするNIC   |
+| haproxy_backend_servers | []     | 振分け先サーバ     |
+| keepalived_check_interface | none | チェックするNIC   |
 | keepalived_virtual_ipaddr | none | VIP                |
