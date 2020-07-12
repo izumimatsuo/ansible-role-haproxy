@@ -1,4 +1,4 @@
-# ansible-role-haproxy
+# ansible-role-haproxy [![Build Status](https://travis-ci.org/izumimatsuo/ansible-role-haproxy.svg?branch=master)](https://travis-ci.org/izumimatsuo/ansible-role-haproxy)
 
 CentOS 7 に haproxy/keepalived を導入する ansible role です。
 
