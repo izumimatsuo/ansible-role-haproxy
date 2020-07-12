@@ -1,0 +1,13 @@
+---
+# handlers file for ansible-role-haproxy
+- name: restart haproxy service
+  service:
+    name: haproxy
+    state: restarted
+  tags: haproxy
+
+- name: restart keepalived service
+  service:
+    name: keepalived
+    state: restarted
+  tags: haproxy

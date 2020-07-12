@@ -1,0 +1,41 @@
+---
+# tasks file for ansible-role-haproxy
+- name: install haproxy package
+  yum:
+    name:
+      - haproxy
+      - keepalived
+      - psmisc
+  tags: haproxy
+
+- name: copy haproxy conf
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+  notify: restart haproxy service
+  tags: haproxy
+
+- name: start haproxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+  tags: haproxy
+
+- name: copy keepalived conf
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    mode: 0644
+  notify: restart keepalived service
+  when: test_skip is undefined
+  tags: haproxy
+
+- name: start keepalived service
+  service:
+    name: keepalived
+    state: started
+    enabled: yes
+  when: test_skip is undefined
+  tags: haproxy
