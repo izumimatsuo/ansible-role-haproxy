@@ -5,7 +5,6 @@
     name:
       - haproxy
       - keepalived
-      - psmisc
   tags: haproxy
 
 - name: copy haproxy conf
@@ -29,7 +28,7 @@
     dest: /etc/keepalived/keepalived.conf
     mode: 0644
   notify: restart keepalived service
-  when: test_skip is undefined
+  when: haproxy_cluster != None
   tags: haproxy
 
 - name: start keepalived service
@@ -37,5 +36,5 @@
     name: keepalived
     state: started
     enabled: yes
-  when: test_skip is undefined
+  when: haproxy_cluster != None and test_skip is undefined
   tags: haproxy

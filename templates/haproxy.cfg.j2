@@ -40,7 +40,7 @@ frontend  main
 # round robin balancing between the various backends
 #---------------------------------------------------------------------
 backend webproxy
-    balance {{ haproxy_balance_logic }}
+    balance roundrobin
 {% for server in haproxy_backend_servers %}
     server  {{ server }} check
 {% endfor %}

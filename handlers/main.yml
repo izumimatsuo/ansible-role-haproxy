@@ -10,4 +10,5 @@
   service:
     name: keepalived
     state: restarted
+  when: test_skip is undefined
   tags: haproxy

@@ -1,6 +1,10 @@
+global_defs {
+    enable_script_security
+}
+
 vrrp_script chk_haproxy {
-    script "killall -0 haproxy"
-    interval 2
+    script "/usr/bin/systemctl is-active haproxy"
+    interval 3
 }
  
 vrrp_instance VI_1 {
@@ -14,9 +18,11 @@ vrrp_instance VI_1 {
         auth_pass GGhdN3L13l
     }
     virtual_ipaddress {
-        {{ keepalived_virtual_ipaddr }} dev {{ keepalived_check_interface }}
+        {{ haproxy_cluster.virtual_ipaddr }} dev {{ haproxy_cluster.check_interface }}
     }
     track_script {
         chk_haproxy
     }
+    notify_backup "/usr/bin/sudo ip addr del {{ haproxy_cluster.virtual_ipaddr }} dev {{ haproxy_cluster.check_interface }}"
+    notify_fault "/usr/bin/sudo systemctl start haproxy"
 }
