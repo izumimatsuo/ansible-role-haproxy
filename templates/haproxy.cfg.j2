@@ -42,5 +42,5 @@ frontend  main
 backend webproxy
     balance roundrobin
 {% for server in haproxy_backend_servers %}
-    server  {{ server }} check
+    server  proxy{{ loop.index }} {{ server }} {{ 'send-proxy' if use_proxy_protocol }} check
 {% endfor %}
