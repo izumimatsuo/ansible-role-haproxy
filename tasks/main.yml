@@ -31,6 +31,24 @@
   when: haproxy_cluster != None
   tags: haproxy
 
+- name: create script execute user
+  user:
+    name: 'keepalived_script'
+    createhome: no
+    shell: /sbin/nologin
+  when: haproxy_cluster != None
+  tags: haproxy
+
+- name: edit sudoers
+  lineinfile:
+    path: /etc/sudoers.d/keepalived_script
+    create: yes
+    regexp: '^%keepalived_script ALL='
+    line: '%keepalived_script ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+  when: haproxy_cluster != None
+  tags: haproxy
+
 - name: start keepalived service
   service:
     name: keepalived
