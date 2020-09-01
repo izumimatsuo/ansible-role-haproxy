@@ -1,6 +1,7 @@
 ---
 # defaults file for ansible-role-haproxy
 haproxy_frontend_bind: '*:80'
+haproxy_balance_logic: 'roundrobin'
 haproxy_backend_servers: [] # ['192.168.33.21:80', '192.168.33.22:80']
 haproxy_cluster: # {virtual_ipaddr: xxx, check_interface: yyy}
 use_proxy_protocol: no
