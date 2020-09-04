@@ -15,6 +15,30 @@
   notify: restart haproxy service
   tags: haproxy
 
+- name: detect consul-template conf directory
+  stat:
+    path: /etc/consul-template.d
+  register: consul_template_conf_dir
+  tags: haproxy
+
+- name: copy haproxy backend dyna conf
+  template:
+    src: haproxy.cfg.tmpl.j2
+    dest: /etc/haproxy/haproxy.cfg.tmpl
+    mode: 0644
+  notify: restart consul-template service
+  when: consul_template_conf_dir.stat.exists
+  tags: haproxy
+
+- name: copy consul-template conf
+  template:
+    src: haproxy_dyna.conf.j2
+    dest: /etc/consul-template.d/haproxy_dyna.conf
+    mode: 0644
+  notify: restart consul-template service
+  when: consul_template_conf_dir.stat.exists
+  tags: haproxy
+
 - name: start haproxy service
   service:
     name: haproxy
