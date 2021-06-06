@@ -4,8 +4,11 @@
   yum:
     name:
       - haproxy
-      - keepalived
-  tags: haproxy
+
+- name: set default listen port
+  set_fact:
+    haproxy_listen_port: 443
+  when: haproxy_ssl_on and haproxy_listen_port == 80
 
 - name: copy haproxy conf
   template:
@@ -13,70 +16,24 @@
     dest: /etc/haproxy/haproxy.cfg
     mode: 0644
   notify: restart haproxy service
-  tags: haproxy
 
-- name: detect consul-template conf directory
-  stat:
-    path: /etc/consul-template.d
-  register: consul_template_conf_dir
-  tags: haproxy
-
-- name: copy haproxy backend dyna conf
-  template:
-    src: haproxy.cfg.tmpl.j2
-    dest: /etc/haproxy/haproxy.cfg.tmpl
-    mode: 0644
-  notify: restart consul-template service
-  when: consul_template_conf_dir.stat.exists
-  tags: haproxy
-
-- name: copy consul-template conf
-  template:
-    src: haproxy_dyna.conf.j2
-    dest: /etc/consul-template.d/haproxy_dyna.conf
-    mode: 0644
-  notify: restart consul-template service
-  when: consul_template_conf_dir.stat.exists
-  tags: haproxy
+- name: update /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    insertafter: EOF
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (haproxy backends) "
+    block: |
+      {% for host in haproxy_backend_servers %}
+      {% if host.split(':')[0] in hostvars %}
+      {{ hostvars[host.split(':')[0]].ansible_host }}   {{ host.split(':')[0] }}
+      {% endif %}
+      {% endfor %}
 
 - name: start haproxy service
   service:
     name: haproxy
     state: started
     enabled: yes
-  tags: haproxy
 
-- name: copy keepalived conf
-  template:
-    src: keepalived.conf.j2
-    dest: /etc/keepalived/keepalived.conf
-    mode: 0644
-  notify: restart keepalived service
-  when: haproxy_cluster != None
-  tags: haproxy
-
-- name: create script execute user
-  user:
-    name: 'keepalived_script'
-    createhome: no
-    shell: /sbin/nologin
-  when: haproxy_cluster != None
-  tags: haproxy
-
-- name: edit sudoers
-  lineinfile:
-    path: /etc/sudoers.d/keepalived_script
-    create: yes
-    regexp: '^%keepalived_script ALL='
-    line: '%keepalived_script ALL=(ALL) NOPASSWD: ALL'
-    validate: '/usr/sbin/visudo -cf %s'
-  when: haproxy_cluster != None
-  tags: haproxy
-
-- name: start keepalived service
-  service:
-    name: keepalived
-    state: started
-    enabled: yes
-  when: haproxy_cluster != None and test_skip is undefined
-  tags: haproxy
+- include_tasks: keepalived.yml
+  when: haproxy_cluster_info != None

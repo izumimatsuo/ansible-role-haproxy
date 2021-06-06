@@ -3,7 +3,6 @@
 #---------------------------------------------------------------------
 global
     log         127.0.0.1 local2
-
     chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
     maxconn     4000
@@ -11,16 +10,16 @@ global
     group       haproxy
     daemon
     stats socket /var/lib/haproxy/stats
+    tune.ssl.default-dh-param 2048
 
 #---------------------------------------------------------------------
 # common defaults that all the 'listen' and 'backend' sections will
 # use if not designated in their block
 #---------------------------------------------------------------------
 defaults
-    mode                    tcp
+    mode                    http
     log                     global
     option                  dontlognull
-    option forwardfor       except 127.0.0.0/8
     option                  redispatch
     retries                 3
     timeout queue           1m
@@ -33,14 +32,16 @@ defaults
 # main frontend which proxys to the backends
 #---------------------------------------------------------------------
 frontend  main
-    bind                    {{ haproxy_frontend_bind }}
-    default_backend         webproxy
+    bind                    *:{{ haproxy_listen_port }} {{ 'ssl crt /etc/haproxy/cert/server.pem' if haproxy_ssl_on }}
+    option                  forwardfor
+    reqadd                  X-Forwarded-Proto:\ {{ 'https' if haproxy_ssl_on else 'http' }}
+    default_backend         default
 
 #---------------------------------------------------------------------
 # round robin balancing between the various backends
 #---------------------------------------------------------------------
-backend webproxy
-    balance {{ haproxy_balance_logic }}
+backend default
+    balance roundrobin
 {% for server in haproxy_backend_servers %}
-    server  proxy{{ loop.index }} {{ server }} {{ 'send-proxy' if use_proxy_protocol }} check
+    server  server_{{ loop.index }} {{ server }} {{ 'send-proxy' if use_proxy_protocol }} check
 {% endfor %}
