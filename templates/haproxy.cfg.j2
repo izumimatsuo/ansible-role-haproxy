@@ -35,6 +35,14 @@ frontend  main
     bind                    *:{{ haproxy_listen_port }} {{ 'ssl crt /etc/haproxy/cert/server.pem' if haproxy_ssl_on }}
     option                  forwardfor
     reqadd                  X-Forwarded-Proto:\ {{ 'https' if haproxy_ssl_on else 'http' }}
+    # サーバ情報の隠蔽
+    rspdel                  ^Server:
+    # クリックジャッキング対策
+    rspadd                  X-Frame-Options:\ DENY
+    # スニッフィング対策
+    rspadd                  X-Content-Type-Options:\ nosniff
+    # XSS対策
+    rspadd                  X-XSS-Protection:\ 1;\ mode=block
     default_backend         default
 
 #---------------------------------------------------------------------
