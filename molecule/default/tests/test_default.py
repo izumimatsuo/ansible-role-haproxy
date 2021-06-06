@@ -20,7 +20,7 @@ def test_haproxy_running_and_enabled(host):
 
 
 def test_haproxy_listen(host):
-    assert host.socket('tcp://0.0.0.0:80').is_listening
+    assert host.socket('tcp://0.0.0.0:443').is_listening
 
 
 def test_keepalived_is_installed(host):

@@ -28,6 +28,7 @@
       {{ hostvars[host.split(':')[0]].ansible_host }}   {{ host.split(':')[0] }}
       {% endif %}
       {% endfor %}
+  when: haproxy_backend_servers != None and test_skip is undefined
 
 - name: start haproxy service
   service:
