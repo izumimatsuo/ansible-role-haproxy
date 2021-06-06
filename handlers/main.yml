@@ -4,18 +4,9 @@
   service:
     name: haproxy
     state: restarted
-  tags: haproxy
 
 - name: restart keepalived service
   service:
     name: keepalived
     state: restarted
   when: test_skip is undefined
-  tags: haproxy
-
-- name: restart consul-template service
-  service:
-    name: consul-template
-    state: restarted
-  when: test_skip is undefined
-  tags: haproxy
