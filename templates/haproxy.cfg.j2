@@ -38,11 +38,11 @@ frontend  main
     # サーバ情報の隠蔽
     rspdel                  ^Server:
     # クリックジャッキング対策
-    rspadd                  X-Frame-Options:\ DENY
+    # rspadd                  X-Frame-Options:\ DENY
     # スニッフィング対策
-    rspadd                  X-Content-Type-Options:\ nosniff
+    # rspadd                  X-Content-Type-Options:\ nosniff
     # XSS対策
-    rspadd                  X-XSS-Protection:\ 1;\ mode=block
+    # rspadd                  X-XSS-Protection:\ 1;\ mode=block
     default_backend         default
 
 #---------------------------------------------------------------------
