@@ -17,24 +17,8 @@
     mode: 0644
   notify: restart haproxy service
 
-- name: update /etc/hosts
-  blockinfile:
-    path: /etc/hosts
-    insertafter: EOF
-    marker: "# {mark} ANSIBLE MANAGED BLOCK (haproxy backends) "
-    block: |
-      {% for host in haproxy_backend_servers %}
-      {% if host.split(':')[0] in hostvars %}
-      {{ hostvars[host.split(':')[0]].ansible_host }}   {{ host.split(':')[0] }}
-      {% endif %}
-      {% endfor %}
-  when: haproxy_backend_servers != None and test_skip is undefined
-
 - name: start haproxy service
   service:
     name: haproxy
     state: started
     enabled: yes
-
-- include_tasks: keepalived.yml
-  when: haproxy_cluster_info != None

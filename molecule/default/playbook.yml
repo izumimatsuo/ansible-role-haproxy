@@ -1,10 +1,6 @@
 ---
 - name: Converge
   hosts: all
-  vars:
-    haproxy_backend_servers: ['192.168.0.1:443', '192.168.0.2:443']
-    haproxy_cluster_info: {virtual_ipaddr: '192.168.0.10', check_interface: 'eth0'}
-    test_skip: true
   pre_tasks:
     - name: create directory
       file:

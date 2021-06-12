@@ -21,9 +21,3 @@ def test_haproxy_running_and_enabled(host):
 
 def test_haproxy_listen(host):
     assert host.socket('tcp://0.0.0.0:443').is_listening
-
-
-def test_keepalived_is_installed(host):
-    package = host.package("keepalived")
-    assert package.is_installed
-    assert package.version.startswith("1.3")
