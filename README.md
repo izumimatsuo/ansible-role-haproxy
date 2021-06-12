@@ -1,6 +1,6 @@
 # ansible-role-haproxy [![Build Status](https://travis-ci.com/izumimatsuo/ansible-role-haproxy.svg?branch=master)](https://travis-ci.com/izumimatsuo/ansible-role-haproxy)
 
-CentOS 7 に haproxy/keepalived を導入する ansible role です。
+CentOS 7 に haproxy を導入する ansible role です。
 SSL 通信するためには、以下のとおりに証明書が配置されていること
 
 - /etc/haproxy/cert/server.pem
