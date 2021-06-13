@@ -32,17 +32,23 @@ defaults
 # main frontend which proxys to the backends
 #---------------------------------------------------------------------
 frontend  main
+{% if haproxy_ssl_on %}
+    bind                    *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+{% endif %}
     bind                    *:{{ haproxy_listen_port }} {{ 'ssl crt /etc/haproxy/cert/server.pem' if haproxy_ssl_on }}
     option                  forwardfor
     reqadd                  X-Forwarded-Proto:\ {{ 'https' if haproxy_ssl_on else 'http' }}
     # サーバ情報の隠蔽
     rspdel                  ^Server:
+{% if haproxy_security_headers_on %}
     # クリックジャッキング対策
-    # rspadd                  X-Frame-Options:\ DENY
+    rspadd                  X-Frame-Options:\ DENY
     # スニッフィング対策
-    # rspadd                  X-Content-Type-Options:\ nosniff
+    rspadd                  X-Content-Type-Options:\ nosniff
     # XSS対策
-    # rspadd                  X-XSS-Protection:\ 1;\ mode=block
+    rspadd                  X-XSS-Protection:\ 1;\ mode=block
+{% endif %}
     default_backend         default
 
 #---------------------------------------------------------------------
