@@ -2,6 +2,7 @@
 
 CentOS 7 に haproxy を導入する ansible role です。
 SSL 通信するためには、以下のとおりに証明書が配置されていること
+（配置されていなかった場合は、自己署名証明書を作成して配置します）
 
 - /etc/haproxy/cert/server.pem
 

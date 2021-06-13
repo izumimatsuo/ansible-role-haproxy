@@ -10,6 +10,18 @@
     haproxy_listen_port: 443
   when: haproxy_ssl_on and haproxy_listen_port == 80
 
+- block:
+  - name: create cert directory
+    file:
+      path: /etc/haproxy/cert
+      state: directory
+      mode: '0755'
+  - name: create cert file (server.pem)
+    shell: 'cd /etc/haproxy/cert; openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -subj /CN=localhost -keyout server.key -out server.crt; cat server.key server.crt > server.pem' # noqa 301 204
+    args:
+      creates: /etc/haproxy/cert/server.pem
+  when: haproxy_ssl_on
+
 - name: copy haproxy conf
   template:
     src: haproxy.cfg.j2
