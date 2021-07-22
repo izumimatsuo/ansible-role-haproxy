@@ -29,33 +29,25 @@ defaults
     timeout check           10s
 
 #---------------------------------------------------------------------
-# main frontend which proxys to the backends
+# main listener which proxys to the backends
 #---------------------------------------------------------------------
-frontend  main
-{% if haproxy_ssl_on %}
-    bind                    *:80
-    redirect scheme https code 301 if !{ ssl_fc }
-{% endif %}
-    bind                    *:{{ haproxy_listen_port }} {{ 'ssl crt /etc/haproxy/cert/server.pem' if haproxy_ssl_on }}
+{% for listener in haproxy_listeners %}
+frontend  {{ listener.protocol }}:{{ listener.listen_port }}
+    bind                    *:{{ listener.listen_port }} {{ 'ssl crt '+listener.ssl_certificate if listener.protocol == 'https' }}
     option                  forwardfor
-    reqadd                  X-Forwarded-Proto:\ {{ 'https' if haproxy_ssl_on else 'http' }}
-    # サーバ情報の隠蔽
+    reqadd                  X-Forwarded-Proto:\ {{ listener.protocol }}
     rspdel                  ^Server:
-{% if haproxy_security_headers_on %}
-    # クリックジャッキング対策
-    rspadd                  X-Frame-Options:\ DENY
-    # スニッフィング対策
-    rspadd                  X-Content-Type-Options:\ nosniff
-    # XSS対策
-    rspadd                  X-XSS-Protection:\ 1;\ mode=block
-{% endif %}
-    default_backend         default
+    default_backend         {{ listener.default_backend if listener.default_backend is defined else 'default' }}
+{% endfor %}
 
 #---------------------------------------------------------------------
 # round robin balancing between the various backends
 #---------------------------------------------------------------------
-backend default
+{% for backend in haproxy_backend_groups %}
+backend {{ backend.name }}
+    mode    {{ backend.protocol }}
     balance roundrobin
-{% for server in haproxy_backend_servers %}
-    server  server_{{ loop.index }} {{ server }} {{ 'send-proxy' if use_proxy_protocol }} check
+{% for server in haproxy_backend_servers[backend.name] %}
+    server  server_{{ loop.index }} {{ server }}:{{ backend.listen_port }} check
+{% endfor %}
 {% endfor %}
