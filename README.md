@@ -13,5 +13,5 @@ SSL 通信するためには、以下のとおりにリスナー設定と証明�
 | 項目名                  | デフォルト値       | 説明               |
 | ----------------------- | ------------------ | ------------------ |
 | haproxy_listeners       | [{listen_port: 80, protocol: 'http', ssl_certificate:, default_backend: 'default'}] | リスナー |
-| haproxy_backend_groups  | [{name: 'default', listen_port: 80, protocol: 'http' | 振分け先グループ |
+| haproxy_backend_groups  | [{name: 'default', listen_port: 80, protocol: 'http'}] | 振分け先グループ |
 | haproxy_backend_servers | {default: ['127.0.0.1']} | 振分け先サーバ 例 ['192.168.33.21', '192.168.33.22'] |
