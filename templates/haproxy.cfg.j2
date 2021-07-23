@@ -48,6 +48,6 @@ backend {{ backend.name }}
     mode    {{ backend.protocol }}
     balance roundrobin
 {% for server in haproxy_backend_servers[backend.name] %}
-    server  server_{{ loop.index }} {{ server }}:{{ backend.listen_port }} check
+    server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ backend.listen_port }} check
 {% endfor %}
 {% endfor %}
