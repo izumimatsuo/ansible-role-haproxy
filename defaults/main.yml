@@ -10,6 +10,7 @@ haproxy_backend_groups:
   - name: 'default'
     listen_port: 80
     protocol: 'http'
+    healthcheck_path: '/'
 
 haproxy_backend_servers:
   default: ['127.0.0.1']

@@ -1,9 +1,0 @@
-127.0.0.1   localhost
-
-{% for name in haproxy_backend_servers %}
-{% for host in haproxy_backend_servers[name] %}
-{% if hostvars[host] is defined %}
-{{ hostvars[host].ansible_host }}   {{ host }}
-{% endif %}
-{% endfor %}
-{% endfor %}
