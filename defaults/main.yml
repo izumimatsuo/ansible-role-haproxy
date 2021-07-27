@@ -1,16 +1,14 @@
 ---
 # defaults file for ansible-role-haproxy
-haproxy_listeners:
+haproxy_frontend_listeners:
   - listen_port: 80
     protocol: 'http'
-    ssl_certificate:
+#    ssl_certificate:
     default_backend: 'default'
 
-haproxy_backend_groups:
+haproxy_backend_targets:
   - name: 'default'
     listen_port: 80
     protocol: 'http'
-    healthcheck_path: '/'
-
-haproxy_backend_servers:
-  default: ['127.0.0.1']
+#    healthcheck_path: '/'
+    servers: ['127.0.0.1']

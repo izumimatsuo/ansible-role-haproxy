@@ -31,24 +31,25 @@ defaults
 #---------------------------------------------------------------------
 # main listener which proxys to the backends
 #---------------------------------------------------------------------
-{% for listener in haproxy_listeners %}
+{% for listener in haproxy_frontend_listeners %}
 frontend  {{ listener.protocol }}:{{ listener.listen_port }}
     bind                    *:{{ listener.listen_port }} {{ 'ssl crt '+listener.ssl_certificate if listener.protocol == 'https' }}
     option                  forwardfor
     reqadd                  X-Forwarded-Proto:\ {{ listener.protocol }}
     rspdel                  ^Server:
     default_backend         {{ listener.default_backend if listener.default_backend is defined else 'default' }}
-{% endfor %}
 
+{% endfor %}
 #---------------------------------------------------------------------
 # round robin balancing between the various backends
 #---------------------------------------------------------------------
-{% for backend in haproxy_backend_groups %}
-backend {{ backend.name }}
-    mode    {{ backend.protocol }}
+{% for target in haproxy_backend_targets %}
+backend {{ target.name }}
+    mode    {{ target.protocol }}
     balance roundrobin
-    {{ 'option  httpchk GET '+backend.healthcheck_path if backend.healthcheck_path is defined }}
-{% for server in haproxy_backend_servers[backend.name] %}
-    server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ backend.listen_port }} check
+    {{ 'option  httpchk GET '+target.healthcheck_path if target.healthcheck_path is defined }}
+{% for server in target.servers %}
+    server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ target.listen_port }} check
 {% endfor %}
+
 {% endfor %}
