@@ -45,9 +45,9 @@ frontend  {{ listener.protocol }}:{{ listener.listen_port }}
 #---------------------------------------------------------------------
 {% for target in haproxy_backend_targets %}
 backend {{ target.name }}
-    mode    {{ target.protocol }}
     balance roundrobin
     {{ 'option  httpchk GET '+target.healthcheck_path if target.healthcheck_path is defined }}
+
 {% for server in target.servers %}
     server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ target.listen_port }} check
 {% endfor %}
