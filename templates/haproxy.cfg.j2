@@ -31,6 +31,12 @@ defaults
 #---------------------------------------------------------------------
 # main listener which proxys to the backends
 #---------------------------------------------------------------------
+{% if haproxy_always_on_ssl %}
+frontend http2https
+    bind                    *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+
+{% endif %}
 {% for listener in haproxy_frontend_listeners %}
 frontend  {{ listener.protocol }}:{{ listener.listen_port }}
     bind                    *:{{ listener.listen_port }} {{ 'ssl crt '+listener.ssl_certificate if listener.protocol == 'https' }}
@@ -38,6 +44,11 @@ frontend  {{ listener.protocol }}:{{ listener.listen_port }}
     reqadd                  X-Forwarded-Proto:\ {{ listener.protocol }}
     rspdel                  ^Server:
     default_backend         {{ listener.default_backend if listener.default_backend is defined else 'default' }}
+{% if listener.rules is defined %}
+{% for rule in listener.rules %}
+    {{ rule.then+' if { '+rule.if+' }' }}
+{% endfor %}
+{% endif %}
 
 {% endfor %}
 #---------------------------------------------------------------------
@@ -46,7 +57,9 @@ frontend  {{ listener.protocol }}:{{ listener.listen_port }}
 {% for target in haproxy_backend_targets %}
 backend {{ target.name }}
     balance roundrobin
-    {{ 'option  httpchk GET '+target.healthcheck_path if target.healthcheck_path is defined }}
+{% if target.healthcheck_path is defined %}
+    {{ 'option  httpchk GET '+target.healthcheck_path }}
+{% endif %}
 
 {% for server in target.servers %}
     server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ target.listen_port }} check
