@@ -10,7 +10,7 @@ haproxy_frontend_listeners:
 
 haproxy_backend_targets:
   - name: 'default'
-    listen_port: 80
-    protocol: 'http'
+#    listen_port: 80
+#    protocol: 'http'
 #    healthcheck_path: '/'
-    servers: ['127.0.0.1']
+    servers: []
