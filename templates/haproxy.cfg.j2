@@ -62,7 +62,7 @@ backend {{ target.name }}
 {% endif %}
 
 {% for server in target.servers %}
-    server  server_{{ loop.index }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ target.listen_port }} check
+    server  {{ 'server_'~loop.index if hostvars[server] is undefined else server }} {{ hostvars[server].ansible_host if hostvars[server].ansible_host is defined else server }}:{{ target.listen_port }} check
 {% endfor %}
 
 {% endfor %}
